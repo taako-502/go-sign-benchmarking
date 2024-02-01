@@ -2,33 +2,84 @@ package main
 
 import (
 	"fmt"
+	"go-sign-benchmarking/generate_key"
+	"go-sign-benchmarking/sign_benchmark"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
+const ITERATIONS = 10000
+
 func main() {
-	// JWT署名のための秘密鍵
-	secretKey := []byte("your-secret-key")
-
-	// 署名を10,000回繰り返す
-	startTime := time.Now()
-	for i := 0; i < 10000; i++ {
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"name": "John Doe",
-			"exp":  time.Now().Add(time.Hour * 72).Unix(),
-		})
-
-		// トークンに署名を追加
-		_, err := token.SignedString(secretKey)
-		if err != nil {
-			fmt.Printf("トークンの署名に失敗しました: %v\n", err)
-			return
-		}
+	fmt.Println("# 対称鍵署名アルゴリズム")
+	fmt.Println("## HS256")
+	s := sign_benchmark.NewSymmetricKeyReciever([]byte("your-secret-key"))
+	duration, err := s.SymmetricKeySignatureAlgorithm(jwt.SigningMethodHS256, ITERATIONS)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
-	endTime := time.Now()
+	printDuration(duration)
 
-	// 処理にかかった時間を計算し、表示
-	duration := endTime.Sub(startTime)
-	fmt.Printf("JWT署名生成（10,000回）にかかった時間: %v\n", duration)
+	fmt.Println("◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎")
+	fmt.Println("# 非対称鍵署名アルゴリズム")
+	fmt.Println("## Ed25519")
+	_, privateKey, err := generate_key.GenerateEd25519KeyPair()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	a := sign_benchmark.NewAsymmetricKeyReciever(privateKey, []byte(""))
+	duration, err = a.AsymmetricKeySignatureAlgorithm(&jwt.SigningMethodEd25519{}, ITERATIONS)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printDuration(duration)
+
+	fmt.Println("◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎")
+	fmt.Println("## RS256")
+	_, rsaPrivateKey, err := generate_key.GenerateRSAKeyPair(2048) // 通常は2048または4096
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	a = sign_benchmark.NewAsymmetricKeyReciever(rsaPrivateKey, []byte(""))
+	duration, err = a.AsymmetricKeySignatureAlgorithm(jwt.SigningMethodRS256, ITERATIONS)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printDuration(duration)
+
+	fmt.Println("◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎")
+	fmt.Println("## ES256")
+	_, ecdsaPrivateKey, err := generate_key.GenerateECDSAKeyPair()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	a = sign_benchmark.NewAsymmetricKeyReciever(ecdsaPrivateKey, []byte(""))
+	duration, err = a.AsymmetricKeySignatureAlgorithm(jwt.SigningMethodES256, ITERATIONS)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printDuration(duration)
+
+	fmt.Println("◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎")
+	fmt.Println("## PS256")
+	a = sign_benchmark.NewAsymmetricKeyReciever(rsaPrivateKey, []byte("")) // RS256と同じ鍵を使う
+	duration, err = a.AsymmetricKeySignatureAlgorithm(jwt.SigningMethodPS256, ITERATIONS)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	printDuration(duration)
+}
+
+func printDuration(duration time.Duration) {
+	milliseconds := float64(duration) / float64(time.Millisecond)
+	fmt.Printf("JWT署名生成（10,000回）にかかった時間: %.3f ms\n", milliseconds)
 }
