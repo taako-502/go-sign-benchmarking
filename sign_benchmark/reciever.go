@@ -1,11 +1,13 @@
 package sign_benchmark
 
 type signReciever struct {
-	secretKey interface{}
+	secretKey     interface{}
+	encryptionKey interface{}
 }
 
-func NewSignReciever(secretKey interface{}) signReciever {
+func NewSignReciever(secretKey interface{}, encryptionKey interface{}) signReciever {
 	return signReciever{
-		secretKey: secretKey,
+		secretKey:     secretKey,
+		encryptionKey: encryptionKey,
 	}
 }
