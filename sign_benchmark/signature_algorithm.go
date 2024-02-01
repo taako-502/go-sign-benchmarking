@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s asymmetricKeyReciever) AsymmetricKeySignatureAlgorithm(method jwt.SigningMethod, iterations int) (time.Duration, error) {
+func (s signReciever) SignatureAlgorithm(method jwt.SigningMethod, iterations int) (time.Duration, error) {
 	startTime := time.Now()
 	for i := 0; i < iterations; i++ {
 		token := jwt.NewWithClaims(method, jwt.MapClaims{
@@ -15,7 +15,7 @@ func (s asymmetricKeyReciever) AsymmetricKeySignatureAlgorithm(method jwt.Signin
 			"exp":  time.Now().Add(time.Hour * 72).Unix(),
 		})
 
-		if _, err := token.SignedString(s.privateKey); err != nil {
+		if _, err := token.SignedString(s.secretKey); err != nil {
 			return 0, errors.Wrap(err, "jwt.Token.SignedString")
 		}
 	}

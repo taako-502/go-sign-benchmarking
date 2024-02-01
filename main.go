@@ -14,8 +14,13 @@ const ITERATIONS = 10000
 func main() {
 	fmt.Println("# 対称鍵署名アルゴリズム")
 	fmt.Println("## HS256")
-	s := sign_benchmark.NewSymmetricKeyReciever([]byte("your-secret-key"))
-	duration, err := s.SymmetricKeySignatureAlgorithm(jwt.SigningMethodHS256, ITERATIONS)
+	secretKey, err := generate_key.GenerateHS256Key()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	s := sign_benchmark.NewSignReciever(secretKey)
+	duration, err := s.SignatureAlgorithm(jwt.SigningMethodHS256, ITERATIONS)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -30,8 +35,8 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	a := sign_benchmark.NewAsymmetricKeyReciever(privateKey, []byte(""))
-	duration, err = a.AsymmetricKeySignatureAlgorithm(&jwt.SigningMethodEd25519{}, ITERATIONS)
+	a := sign_benchmark.NewSignReciever(privateKey)
+	duration, err = a.SignatureAlgorithm(&jwt.SigningMethodEd25519{}, ITERATIONS)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -45,8 +50,8 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	a = sign_benchmark.NewAsymmetricKeyReciever(rsaPrivateKey, []byte(""))
-	duration, err = a.AsymmetricKeySignatureAlgorithm(jwt.SigningMethodRS256, ITERATIONS)
+	a = sign_benchmark.NewSignReciever(rsaPrivateKey)
+	duration, err = a.SignatureAlgorithm(jwt.SigningMethodRS256, ITERATIONS)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -60,8 +65,8 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	a = sign_benchmark.NewAsymmetricKeyReciever(ecdsaPrivateKey, []byte(""))
-	duration, err = a.AsymmetricKeySignatureAlgorithm(jwt.SigningMethodES256, ITERATIONS)
+	a = sign_benchmark.NewSignReciever(ecdsaPrivateKey)
+	duration, err = a.SignatureAlgorithm(jwt.SigningMethodES256, ITERATIONS)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -70,8 +75,8 @@ func main() {
 
 	fmt.Println("◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎◻︎◾︎")
 	fmt.Println("## PS256")
-	a = sign_benchmark.NewAsymmetricKeyReciever(rsaPrivateKey, []byte("")) // RS256と同じ鍵を使う
-	duration, err = a.AsymmetricKeySignatureAlgorithm(jwt.SigningMethodPS256, ITERATIONS)
+	a = sign_benchmark.NewSignReciever(rsaPrivateKey) // RS256と同じ鍵を使う
+	duration, err = a.SignatureAlgorithm(jwt.SigningMethodPS256, ITERATIONS)
 	if err != nil {
 		fmt.Println(err)
 		return
