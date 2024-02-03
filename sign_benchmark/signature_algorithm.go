@@ -7,10 +7,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s signReciever) SignatureAlgorithm(method jwt.SigningMethod, iterations int) (time.Duration, error) {
+func (s signReciever) SignatureAlgorithm(iterations int) (time.Duration, error) {
 	startTime := time.Now()
 	for i := 0; i < iterations; i++ {
-		token := jwt.NewWithClaims(method, jwt.MapClaims{
+		token := jwt.NewWithClaims(s.method, jwt.MapClaims{
 			"name": "John Doe",
 			"exp":  time.Now().Add(time.Hour * 72).Unix(),
 		})

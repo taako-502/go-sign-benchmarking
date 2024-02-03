@@ -9,9 +9,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s signReciever) SignatureVerification(method jwt.SigningMethod, iterations int) (time.Duration, error) {
+func (s signReciever) SignatureVerification(iterations int) (time.Duration, error) {
 	// まず署名されたトークンを生成
-	token := jwt.NewWithClaims(method, jwt.MapClaims{
+	token := jwt.NewWithClaims(s.method, jwt.MapClaims{
 		"name": "John Doe",
 		"exp":  time.Now().Add(time.Hour * 72).Unix(),
 	})
@@ -25,7 +25,7 @@ func (s signReciever) SignatureVerification(method jwt.SigningMethod, iterations
 	startTime := time.Now()
 	for i := 0; i < iterations; i++ {
 		_, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
-			if token.Method != method {
+			if token.Method != s.method {
 				return nil, errors.New("不正な署名方法")
 			}
 			// RSAまたはRSA-PSSの場合は公開鍵を使用

@@ -35,8 +35,8 @@ func main() {
 
 	fmt.Println("・〜・〜・〜・〜・〜・〜署名の作成速度の測定・〜・〜・〜・〜・〜・〜")
 	for _, method := range algorithms {
-		s := sign_benchmark.NewSignReciever(method.secretKey, nil)
-		duration, err := s.SignatureAlgorithm(method.method, 10000)
+		s := sign_benchmark.NewSignReciever(method.secretKey, nil, method.method)
+		duration, err := s.SignatureAlgorithm(10000)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -51,8 +51,8 @@ func main() {
 	for _, a := range algorithms {
 		fmt.Println("")
 		fmt.Printf("## %s\r\n", a.label)
-		s := sign_benchmark.NewSignReciever(a.secretKey, a.encryptionKey)
-		duration, err := s.SignatureVerification(a.method, 10000)
+		s := sign_benchmark.NewSignReciever(a.secretKey, a.encryptionKey, a.method)
+		duration, err := s.SignatureVerification(10000)
 		if err != nil {
 			fmt.Println(err)
 			return

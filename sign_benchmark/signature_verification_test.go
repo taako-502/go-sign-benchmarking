@@ -14,9 +14,9 @@ func Test_signReciever_SignatureVerification(t *testing.T) {
 	}
 	type fields struct {
 		secretKey interface{}
+		method    jwt.SigningMethod
 	}
 	type args struct {
-		method     jwt.SigningMethod
 		iterations int
 	}
 	tests := []struct {
@@ -27,17 +27,15 @@ func Test_signReciever_SignatureVerification(t *testing.T) {
 	}{
 		{
 			name:    "動作確認",
-			fields:  fields{secretKey: secretKey},
-			args:    args{method: jwt.SigningMethodHS256, iterations: 1},
+			fields:  fields{secretKey: secretKey, method: jwt.SigningMethodHS256},
+			args:    args{iterations: 1},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := signReciever{
-				secretKey: tt.fields.secretKey,
-			}
-			_, err := s.SignatureVerification(tt.args.method, tt.args.iterations)
+			s := NewSignReciever(tt.fields.secretKey, nil, tt.fields.method)
+			_, err := s.SignatureVerification(tt.args.iterations)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("signReciever.SignatureVerification() error = %v, wantErr %v", err, tt.wantErr)
 				return
