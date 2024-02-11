@@ -1,7 +1,9 @@
 # go-sign-benchmarking
 
-My Blog post.
+My Blog post.<br>
 https://ap-ep.com/go-jwt-sign-benchmark/
+
+## Usage
 
 ```bash
 $ go run main.go
