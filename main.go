@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/pkg/errors"
 )
 
 type algorithm struct {
@@ -70,7 +69,7 @@ func buildAlgorithms() ([]algorithm, error) {
 	// HS256
 	secretKey, err := generate_key.GenerateHS256Key()
 	if err != nil {
-		return nil, errors.Wrap(err, "generate_key.GenerateHS256Key")
+		return nil, fmt.Errorf("generate_key.GenerateHS256Key: %w", err)
 	}
 	algorithms = append(algorithms,
 		newAlgorithm(secretKey, secretKey, "HS256", jwt.SigningMethodHS256),
@@ -79,7 +78,7 @@ func buildAlgorithms() ([]algorithm, error) {
 	// Ed25519
 	publickKey, privateKey, err := generate_key.GenerateEd25519KeyPair()
 	if err != nil {
-		return nil, errors.Wrap(err, "generate_key.GenerateEd25519KeyPair")
+		return nil, fmt.Errorf("generate_key.GenerateEd25519KeyPair: %w", err)
 	}
 	algorithms = append(algorithms,
 		newAlgorithm(privateKey, publickKey, "Ed25519", &jwt.SigningMethodEd25519{}),
@@ -88,7 +87,7 @@ func buildAlgorithms() ([]algorithm, error) {
 	// RS256
 	rsaPublicKey, rsaPrivateKey, err := generate_key.GenerateRSAKeyPair(2048) // 通常は2048または4096
 	if err != nil {
-		return nil, errors.Wrap(err, "generate_key.GenerateRSAKeyPair")
+		return nil, fmt.Errorf("generate_key.GenerateRSAKeyPair: %w", err)
 	}
 	algorithms = append(algorithms,
 		newAlgorithm(rsaPrivateKey, rsaPublicKey, "RS256", jwt.SigningMethodRS256),
@@ -97,7 +96,7 @@ func buildAlgorithms() ([]algorithm, error) {
 	// ES256
 	ecdsaPublicKey, ecdsaPrivateKey, err := generate_key.GenerateECDSAKeyPair()
 	if err != nil {
-		return nil, errors.Wrap(err, "generate_key.GenerateECDSAKeyPair")
+		return nil, fmt.Errorf("generate_key.GenerateECDSAKeyPair: %w", err)
 	}
 	algorithms = append(algorithms,
 		newAlgorithm(ecdsaPrivateKey, ecdsaPublicKey, "ES256", jwt.SigningMethodES256),

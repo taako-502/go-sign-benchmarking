@@ -1,10 +1,10 @@
 package sign_benchmark
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/pkg/errors"
 )
 
 func (s signReciever) SignatureAlgorithm(iterations int) (time.Duration, error) {
@@ -16,7 +16,7 @@ func (s signReciever) SignatureAlgorithm(iterations int) (time.Duration, error) 
 		})
 
 		if _, err := token.SignedString(s.secretKey); err != nil {
-			return 0, errors.Wrap(err, "jwt.Token.SignedString")
+			return 0, fmt.Errorf("jwt.Token.SignedString: %w", err)
 		}
 	}
 	endTime := time.Now()

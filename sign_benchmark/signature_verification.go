@@ -3,10 +3,10 @@ package sign_benchmark
 import (
 	"crypto/ecdsa"
 	"crypto/rsa"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/pkg/errors"
 )
 
 func (s signReciever) SignatureVerification(iterations int) (time.Duration, error) {
@@ -18,7 +18,7 @@ func (s signReciever) SignatureVerification(iterations int) (time.Duration, erro
 
 	signedToken, err := token.SignedString(s.secretKey)
 	if err != nil {
-		return 0, errors.Wrap(err, "jwt.Token.SignedString")
+		return 0, fmt.Errorf("jwt.Token.SignedString: %w", err)
 	}
 
 	// 生成したトークンを指定された回数だけ検証
@@ -26,7 +26,7 @@ func (s signReciever) SignatureVerification(iterations int) (time.Duration, erro
 	for i := 0; i < iterations; i++ {
 		_, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
 			if token.Method != s.method {
-				return nil, errors.New("不正な署名方法")
+				return nil, fmt.Errorf("不正な署名方法: %s", token.Method.Alg())
 			}
 			// RSAまたはRSA-PSSの場合は公開鍵を使用
 			switch token.Method.(type) {
@@ -34,13 +34,13 @@ func (s signReciever) SignatureVerification(iterations int) (time.Duration, erro
 				if publicKey, ok := s.encryptionKey.(*rsa.PublicKey); ok {
 					return publicKey, nil
 				}
-				return nil, errors.New("不適切な公開鍵の型")
+				return nil, fmt.Errorf("不適切な公開鍵の型")
 			// ECDSAの場合は公開鍵を使用
 			case *jwt.SigningMethodECDSA:
 				if publicKey, ok := s.encryptionKey.(*ecdsa.PublicKey); ok {
 					return publicKey, nil
 				}
-				return nil, errors.New("不適切な公開鍵の型")
+				return nil, fmt.Errorf("不適切な公開鍵の型")
 			// Ed25519の場合は公開鍵を使用
 			case *jwt.SigningMethodEd25519:
 				return s.encryptionKey, nil
@@ -49,7 +49,7 @@ func (s signReciever) SignatureVerification(iterations int) (time.Duration, erro
 		})
 
 		if err != nil {
-			return 0, errors.Wrap(err, "jwt.Parse")
+			return 0, fmt.Errorf("jwt.Parse: %w", err)
 		}
 	}
 	endTime := time.Now()
